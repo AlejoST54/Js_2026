@@ -1,17 +1,26 @@
-class Empleado{
-
-    //Constructor de la clase Empleado 
-    //Constructor vacío --- no se le asignan valores a los atributos
-    //Atributos
-    //Métodos de la clase Empleado
-    constructor(tipo_documento,cc,nombre, apellido, email, usuario, password) {
-        this.tipo_documento = tipo_documento;
+class Empleado {
+    constructor(cc, nombresApellidos, direccion, email, telefono, sueldoBase, tipoEmpleado, tipoBonificacion) {
         this.cc = cc;
-        this.nombre = nombre;
-        this.apellido = apellido;
+        this.nombresApellidos = nombresApellidos;
+        this.direccion = direccion;
         this.email = email;
-        this.usuario = usuario;
-        this.password = password;
-        
+        this.telefono = telefono;
+        this.sueldoBase = sueldoBase;
+        this.tipoEmpleado = tipoEmpleado;
+        this.tipoBonificacion = tipoBonificacion;
+    }
+
+    hallarSueldo() {
+        let adicion = 0;
+        if (this.tipoBonificacion === 'A') {
+            adicion = 200000;
+        } else if (this.tipoBonificacion === 'B') {
+            adicion = 150000;
+        } else if (this.tipoBonificacion === 'C') {
+            adicion = 100000;
+        } else if (this.tipoBonificacion === 'D') {
+            adicion = 50000;
+        }
+        return parseFloat(this.sueldoBase) + adicion;
     }
 }

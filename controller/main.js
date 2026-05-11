@@ -1,35 +1,24 @@
-//Controlador principal
-
-//Crear los métodos 
-
-//1. Método o función para crear empleados
-
 function crearEmpleado() {
-alert("Creando empleado de forma correcta..."); 
+    alert("Creando empleado de forma correcta...");
 
-//instanciar la clase
-const empleado = new Empleado(
-    document.getElementById("tipoDocumentoId").value,
-    document.getElementById("documentoId").value,
-    document.getElementById("nombreId").value,
-    document.getElementById("apellidosId").value,
-    document.getElementById("emailId").value,
-    document.getElementById("usuarioId").value,
-    document.getElementById("pwdId").value
-);
+    const empleado = new Empleado(
+        document.getElementById("ccId").value,
+        document.getElementById("nombresApellidosId").value,
+        document.getElementById("direccionId").value,
+        document.getElementById("emailId").value,
+        document.getElementById("telefonoId").value,
+        document.getElementById("sueldoBaseId").value,
+        document.getElementById("tipoEmpleadoId").value,
+        document.getElementById("tipoBonificacionId").value
+    );
 
-console.log(empleado);
+    console.log(empleado);
 
-//get para el localStorage API - Lado cliente
-let empleados = JSON.parse(localStorage.getItem("empleados")) || [];
+    let empleados = JSON.parse(localStorage.getItem("empleados")) || [];
+    empleados.push(empleado);
+    localStorage.setItem("empleados", JSON.stringify(empleados));
 
-//push para agregar el nuevo empleado al array de empleados
-empleados.push(empleado);   
-
-//set para guardar el array de empleados actualizado en el localStorage
-localStorage.setItem("empleados", JSON.stringify(empleados));
-
-mostrarEmpleados();
+    mostrarEmpleados();
 }
 
 function mostrarEmpleados() {
@@ -38,36 +27,55 @@ function mostrarEmpleados() {
 
     const tbody = document.querySelector('#tablaEmpleados tbody');
 
-    // Limpiar la tabla antes de volver a pintarla (excepto el encabezado)
     tbody.innerHTML = `<tr>
         <td>No.</td>
-        <td>Tipo de documento</td>
-        <td>Documento</td>
-        <td>Nombres</td>
-        <td>Apellidos</td>  
+        <td>CC</td>
+        <td>Nombres y Apellidos</td>
+        <td>Dirección</td>
         <td>Email</td>
-        <td>Usuario</td>
-        <td>Password</td>
+        <td>Teléfono</td>
+        <td>Sueldo Base</td>
+        <td>Tipo de Empleado</td>
+        <td>Tipo de Bonificación</td>
+        <td>Sueldo Total</td>
+        <td>Modificar</td>
+        <td>Eliminar</td>
     </tr>`;
 
-    empleados.forEach(function(emp, index){
+    empleados.forEach(function(emp, index) {
+        const obj = new Empleado(emp.cc, emp.nombresApellidos, emp.direccion, emp.email, emp.telefono, emp.sueldoBase, emp.tipoEmpleado, emp.tipoBonificacion);
+        const sueldoTotal = obj.hallarSueldo();
+
         const fila = `<tr>
             <td>${index + 1}</td>
-            <td>${emp.tipo_documento}</td>
             <td>${emp.cc}</td>
-            <td>${emp.nombre}</td>
-            <td>${emp.apellido}</td>
+            <td>${emp.nombresApellidos}</td>
+            <td>${emp.direccion}</td>
             <td>${emp.email}</td>
-            <td>${emp.usuario}</td>
-            <td>${emp.password}</td>
-            <td><button type="button" class="btn btn-warning" data-index="${index}" onclick="prepararActualizar(${index})">Actualizar</button></td>
-            <td><button type="button" class="btn btn-danger" data-index="${index}" onclick="eliminarEmpleado(${index})">Eliminar</button></td>
+            <td>${emp.telefono}</td>
+            <td>${emp.sueldoBase}</td>
+            <td>${emp.tipoEmpleado}</td>
+            <td>${emp.tipoBonificacion}</td>
+            <td>${sueldoTotal}</td>
+            <td><button type="button" class="btn btn-warning" onclick="prepararActualizar(${index})">Actualizar</button></td>
+            <td><button type="button" class="btn btn-danger" onclick="eliminarEmpleado(${index})">Eliminar</button></td>
         </tr>`;
         tbody.innerHTML += fila;
     });
+
+    document.getElementById("totalNomina").innerText = "Total Nómina Mensual: $" + hallarTotalNomina();
 }
 
-//2. Función que decide si crear o actualizar según si hay un index guardado
+function hallarTotalNomina() {
+    const empleados = JSON.parse(localStorage.getItem("empleados")) || [];
+    let total = 0;
+    empleados.forEach(function(emp) {
+        const obj = new Empleado(emp.cc, emp.nombresApellidos, emp.direccion, emp.email, emp.telefono, emp.sueldoBase, emp.tipoEmpleado, emp.tipoBonificacion);
+        total += obj.hallarSueldo();
+    });
+    return total;
+}
+
 function guardarEmpleado() {
     const index = document.getElementById("indexEditar").value;
     if (index === "") {
@@ -77,65 +85,55 @@ function guardarEmpleado() {
     }
 }
 
-//3. Método para preparar el formulario con los datos del empleado a actualizar
 function prepararActualizar(index) {
     alert("Preparando actualización del empleado No. " + (index + 1));
 
     const empleados = JSON.parse(localStorage.getItem("empleados")) || [];
     const emp = empleados[index];
 
-    // Llenar el formulario con los datos del empleado seleccionado
-    document.getElementById("tipoDocumentoId").value = emp.tipo_documento;
-    document.getElementById("documentoId").value = emp.cc;
-    document.getElementById("nombreId").value = emp.nombre;
-    document.getElementById("apellidosId").value = emp.apellido;
+    document.getElementById("ccId").value = emp.cc;
+    document.getElementById("nombresApellidosId").value = emp.nombresApellidos;
+    document.getElementById("direccionId").value = emp.direccion;
     document.getElementById("emailId").value = emp.email;
-    document.getElementById("usuarioId").value = emp.usuario;
-    document.getElementById("pwdId").value = emp.password;
-
-    // Guardar el index en un campo oculto para saber cuál actualizar
+    document.getElementById("telefonoId").value = emp.telefono;
+    document.getElementById("sueldoBaseId").value = emp.sueldoBase;
+    document.getElementById("tipoEmpleadoId").value = emp.tipoEmpleado;
+    document.getElementById("tipoBonificacionId").value = emp.tipoBonificacion;
     document.getElementById("indexEditar").value = index;
 
-    // Mostrar la sección de registro con el formulario
     document.getElementById('seccionRegistrarse').style.display = "block";
     document.getElementById('seccionRegistrarse').scrollIntoView({behavior: "smooth"});
 }
 
-//3. Método para actualizar el empleado
 function actualizarEmpleado() {
     alert("Actualizando empleado...");
 
     const index = document.getElementById("indexEditar").value;
     let empleados = JSON.parse(localStorage.getItem("empleados")) || [];
 
-    // Reemplazar el empleado en la posición index con los nuevos datos
     empleados[index] = new Empleado(
-        document.getElementById("tipoDocumentoId").value,
-        document.getElementById("documentoId").value,
-        document.getElementById("nombreId").value,
-        document.getElementById("apellidosId").value,
+        document.getElementById("ccId").value,
+        document.getElementById("nombresApellidosId").value,
+        document.getElementById("direccionId").value,
         document.getElementById("emailId").value,
-        document.getElementById("usuarioId").value,
-        document.getElementById("pwdId").value
+        document.getElementById("telefonoId").value,
+        document.getElementById("sueldoBaseId").value,
+        document.getElementById("tipoEmpleadoId").value,
+        document.getElementById("tipoBonificacionId").value
     );
 
     localStorage.setItem("empleados", JSON.stringify(empleados));
-
-    // Limpiar el index oculto
     document.getElementById("indexEditar").value = "";
 
     mostrarEmpleados();
 }
 
-//5. Método para buscar empleados
 function buscarEmpleado() {
     const texto = document.getElementById("buscarId").value.toLowerCase();
     const empleados = JSON.parse(localStorage.getItem("empleados")) || [];
 
-    // filter para quedarse solo con los que coincidan en nombre, apellido o documento
     const resultado = empleados.filter(function(emp) {
-        return emp.nombre.toLowerCase().includes(texto) ||
-               emp.apellido.toLowerCase().includes(texto) ||
+        return emp.nombresApellidos.toLowerCase().includes(texto) ||
                emp.cc.toLowerCase().includes(texto);
     });
 
@@ -145,25 +143,34 @@ function buscarEmpleado() {
 
     tbody.innerHTML = `<tr>
         <td>No.</td>
-        <td>Tipo de documento</td>
-        <td>Documento</td>
-        <td>Nombres</td>
-        <td>Apellidos</td>  
+        <td>CC</td>
+        <td>Nombres y Apellidos</td>
+        <td>Dirección</td>
         <td>Email</td>
-        <td>Usuario</td>
-        <td>Password</td>
+        <td>Teléfono</td>
+        <td>Sueldo Base</td>
+        <td>Tipo de Empleado</td>
+        <td>Tipo de Bonificación</td>
+        <td>Sueldo Total</td>
+        <td>Modificar</td>
+        <td>Eliminar</td>
     </tr>`;
 
-    resultado.forEach(function(emp, index){
+    resultado.forEach(function(emp, index) {
+        const obj = new Empleado(emp.cc, emp.nombresApellidos, emp.direccion, emp.email, emp.telefono, emp.sueldoBase, emp.tipoEmpleado, emp.tipoBonificacion);
+        const sueldoTotal = obj.hallarSueldo();
+
         const fila = `<tr>
             <td>${index + 1}</td>
-            <td>${emp.tipo_documento}</td>
             <td>${emp.cc}</td>
-            <td>${emp.nombre}</td>
-            <td>${emp.apellido}</td>
+            <td>${emp.nombresApellidos}</td>
+            <td>${emp.direccion}</td>
             <td>${emp.email}</td>
-            <td>${emp.usuario}</td>
-            <td>${emp.password}</td>
+            <td>${emp.telefono}</td>
+            <td>${emp.sueldoBase}</td>
+            <td>${emp.tipoEmpleado}</td>
+            <td>${emp.tipoBonificacion}</td>
+            <td>${sueldoTotal}</td>
             <td><button type="button" class="btn btn-warning" onclick="prepararActualizar(${empleados.indexOf(emp)})">Actualizar</button></td>
             <td><button type="button" class="btn btn-danger" onclick="eliminarEmpleado(${empleados.indexOf(emp)})">Eliminar</button></td>
         </tr>`;
@@ -171,15 +178,11 @@ function buscarEmpleado() {
     });
 }
 
-//4. Método para eliminar un empleado
 function eliminarEmpleado(index) {
     alert("Eliminando empleado No. " + (index + 1));
 
     let empleados = JSON.parse(localStorage.getItem("empleados")) || [];
-
-    // splice elimina 1 elemento en la posición index
     empleados.splice(index, 1);
-
     localStorage.setItem("empleados", JSON.stringify(empleados));
 
     mostrarEmpleados();
