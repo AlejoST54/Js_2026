@@ -23,6 +23,7 @@
 
 
     <script>
+        //alert("Hello World");"
         document.write("<h2>Página en JS</h2>");
         document.write("Esto es un texto hecho en js...  <hr> ");
 
@@ -100,6 +101,15 @@
   </form>
 </div>
 </section>
+
+<!-- Buscador de empleados -->
+<div class="container mt-3">
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" id="buscarId" placeholder="Buscar por nombre, apellido o documento" oninput="buscarEmpleado()">
+    <button class="btn btn-primary" type="button" onclick="buscarEmpleado()">Buscar</button>
+    <button class="btn btn-secondary" type="button" onclick="mostrarEmpleados()">Ver todos</button>
+  </div>
+</div>
 
 <table class="table table-hover" id="tablaEmpleados">
   <tbody>

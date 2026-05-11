@@ -79,7 +79,7 @@ function guardarEmpleado() {
 
 //3. Método para preparar el formulario con los datos del empleado a actualizar
 function prepararActualizar(index) {
-    alert("Actualización del empleado No. " + (index + 1));
+    alert("Preparando actualización del empleado No. " + (index + 1));
 
     const empleados = JSON.parse(localStorage.getItem("empleados")) || [];
     const emp = empleados[index];
@@ -125,6 +125,50 @@ function actualizarEmpleado() {
     document.getElementById("indexEditar").value = "";
 
     mostrarEmpleados();
+}
+
+//5. Método para buscar empleados
+function buscarEmpleado() {
+    const texto = document.getElementById("buscarId").value.toLowerCase();
+    const empleados = JSON.parse(localStorage.getItem("empleados")) || [];
+
+    // filter para quedarse solo con los que coincidan en nombre, apellido o documento
+    const resultado = empleados.filter(function(emp) {
+        return emp.nombre.toLowerCase().includes(texto) ||
+               emp.apellido.toLowerCase().includes(texto) ||
+               emp.cc.toLowerCase().includes(texto);
+    });
+
+    console.log(resultado);
+
+    const tbody = document.querySelector('#tablaEmpleados tbody');
+
+    tbody.innerHTML = `<tr>
+        <td>No.</td>
+        <td>Tipo de documento</td>
+        <td>Documento</td>
+        <td>Nombres</td>
+        <td>Apellidos</td>  
+        <td>Email</td>
+        <td>Usuario</td>
+        <td>Password</td>
+    </tr>`;
+
+    resultado.forEach(function(emp, index){
+        const fila = `<tr>
+            <td>${index + 1}</td>
+            <td>${emp.tipo_documento}</td>
+            <td>${emp.cc}</td>
+            <td>${emp.nombre}</td>
+            <td>${emp.apellido}</td>
+            <td>${emp.email}</td>
+            <td>${emp.usuario}</td>
+            <td>${emp.password}</td>
+            <td><button type="button" class="btn btn-warning" onclick="prepararActualizar(${empleados.indexOf(emp)})">Actualizar</button></td>
+            <td><button type="button" class="btn btn-danger" onclick="eliminarEmpleado(${empleados.indexOf(emp)})">Eliminar</button></td>
+        </tr>`;
+        tbody.innerHTML += fila;
+    });
 }
 
 //4. Método para eliminar un empleado
